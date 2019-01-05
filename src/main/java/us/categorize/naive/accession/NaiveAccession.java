@@ -31,7 +31,7 @@ public class NaiveAccession {
 		user.setAuthorized(true);
 		user.setEmail("kroeders@gmail.com");
 		String sessionKey = UUID.randomUUID().toString();
-		if(!userStore.establishUserSession(user, sessionKey)) {
+		if(!userStore.validateUser(user)) {
 			user.setPasshash(NaiveUserStore.sha256hash(NaiveUserStore.sha256hash(pass)));
 			Configuration.instance().getUserStore().registerUser(user);
 			user.setPasshash(NaiveUserStore.sha256hash(pass));
@@ -39,7 +39,7 @@ public class NaiveAccession {
 				throw new RuntimeException("Unable to create user session");
 			}
 		}
-		
+		userStore.establishUserSession(user, sessionKey);
 		
 		
 		Reddit reddit = new Reddit(user, userStore, Configuration.instance().getMessageStore());
