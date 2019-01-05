@@ -25,6 +25,11 @@ public class NaiveAccession {
 		User user = new User();
 		user.setUsername(userName);
 		user.setPasshash(NaiveUserStore.sha256hash(pass));
+		user.setName("Reddit Accession");
+		user.setGivenName("Reddit");
+		user.setFamilyName("Accession");
+		user.setAuthorized(true);
+		user.setEmail("kroeders@gmail.com");
 		String sessionKey = UUID.randomUUID().toString();
 		if(!userStore.establishUserSession(user, sessionKey)) {
 			user.setPasshash(NaiveUserStore.sha256hash(NaiveUserStore.sha256hash(pass)));
@@ -41,8 +46,8 @@ public class NaiveAccession {
 		String after = null;
 		
 		do {
-			after = reddit.readPage("https://www.reddit.com/r/aww/.json?raw_json=1", after);
-			Thread.sleep(10000);
+			after = reddit.readPage("https://www.reddit.com/r/popular/.json?raw_json=1", after);
+			Thread.sleep(3000);
 		}while(after!=null);
 	}
 
