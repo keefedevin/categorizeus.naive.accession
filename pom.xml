@@ -70,17 +70,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>us.categorize</groupId>
-			<artifactId>api</artifactId>
-			<version>0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>us.categorize</groupId>
-			<artifactId>naive</artifactId>
-			<version>0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>us.categorize</groupId>
-			<artifactId>naive.users</artifactId>
+			<artifactId>naive.app</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
