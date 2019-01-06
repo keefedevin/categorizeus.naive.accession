@@ -2,7 +2,6 @@ package us.categorize.naive.accession;
 
 import java.util.UUID;
 
-import us.categorize.Config;
 import us.categorize.Configuration;
 import us.categorize.api.UserStore;
 import us.categorize.model.User;
@@ -46,7 +45,7 @@ public class NaiveAccession {
 		String after = null;
 		
 		do {
-			after = reddit.readPage("https://www.reddit.com/r/popular/.json?raw_json=1", after);
+			after = reddit.readPage("https://www.reddit.com/r/awww/.json?raw_json=1", after);
 			Thread.sleep(3000);
 		}while(after!=null);
 	}
