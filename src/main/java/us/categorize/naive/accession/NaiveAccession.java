@@ -52,7 +52,8 @@ public class NaiveAccession {
 		String after = null;
 		
 		do {
-			after = reddit.readPage("https://www.reddit.com/r/awww/.json?raw_json=1", after);
+			//note keyboard click with focus = tag, need to keep tags by color and keep them on when selected
+			after = reddit.readPage("https://www.reddit.com/r/aww/.json?raw_json=1", after);
 			Thread.sleep(3000);
 		}while(after!=null);
 	}

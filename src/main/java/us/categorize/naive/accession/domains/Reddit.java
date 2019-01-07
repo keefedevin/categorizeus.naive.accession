@@ -80,7 +80,7 @@ public class Reddit {
 			    		for(String tag : tags) {
 			    			tag = tag.toLowerCase();
 			    			if(!added.contains(tag)) {
-			    				messageStore.addMessageTag(message.getId(), tag, user);
+			    				//messageStore.addMessageTag(message.getId(), tag, user);
 			    				added.add(tag);
 			    			}
 			    		}
