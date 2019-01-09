@@ -47,15 +47,32 @@ public class NaiveAccession {
 		}
 		userStore.establishUserSession(user, sessionKey);
 		
-		
-		Reddit reddit = new Reddit(user, userStore, CategorizeUs.instance().getMessageStore());
-		String after = null;
-		
-		do {
-			//note keyboard click with focus = tag, need to keep tags by color and keep them on when selected
-			after = reddit.readPage("https://www.reddit.com/r/aww/.json?raw_json=1", after);
-			Thread.sleep(3000);
-		}while(after!=null);
+		String tags[] = new String[] {
+				"aww",
+				"pics",
+				"earthporn"				
+		};
+		for(String tag : tags) {
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					Reddit reddit = new Reddit(user, userStore, CategorizeUs.instance().getMessageStore());
+					String after = null;
+					do {
+						//note keyboard click with focus = tag, need to keep tags by color and keep them on when selected
+						after = reddit.readPage("https://www.reddit.com/r/"+tag+"/.json?raw_json=1", after);
+						try {
+							Thread.sleep(3000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}while(after!=null);
+					
+				}
+			}).start();			
+		}
 	}
 
 }
