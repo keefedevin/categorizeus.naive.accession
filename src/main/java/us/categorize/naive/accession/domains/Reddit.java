@@ -68,12 +68,11 @@ public class Reddit {
 			    		String title = entryO.get("title").asText();
 			    		String subreddit = entryO.get("subreddit").asText();
 			    		System.out.println(name + " " + img + " " + title);
-			    		if(!img.endsWith("jpg")) continue;
+			    		if(!(img.endsWith("jpg")||img.endsWith("png"))) continue;
 			    		Message message = new Message();
 			    		message.setTitle(title);
 			    		message.setBody(name + " " + link);
 			    		message.setPostedBy(user.getId());
-			    		message = messageStore.createMessage(message);
 			    		title = title + " " + subreddit;
 			    		String tags[] = title.split(" ");
 			    		Set<String> added = new HashSet<String>();
@@ -85,7 +84,10 @@ public class Reddit {
 			    			}
 			    		}
 			    		lastSeen = name;
-			    		addAttachment(message, img);
+			    		Attachment attachment = addAttachment(message, img);
+			    		message = messageStore.createMessage(message);
+			    		attachment.setMessageId(message.getId());
+			    		messageStore.updateAttachment(attachment);
 			    		System.out.println("Added " + name);
 			    		Thread.sleep(delay);
 			    	}
@@ -103,10 +105,10 @@ public class Reddit {
 		return lastSeen;
 	}
 
-	private void addAttachment(Message message, String img) {
+	private Attachment addAttachment(Message message, String img) {
 		String fname = img.substring(img.lastIndexOf("/"));
 		Attachment attachment = new Attachment();
-		attachment.setFilename(img);
+		attachment.setFilename(fname);
 		attachment.setMessageId(message.getId());
 		HttpGet httpget = new HttpGet(img);
 		CloseableHttpResponse response = null;
@@ -129,7 +131,7 @@ public class Reddit {
 				e.printStackTrace();
 			}
 		}
-
+		return attachment;
 	}
 	
 }

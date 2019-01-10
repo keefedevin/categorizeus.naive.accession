@@ -48,9 +48,10 @@ public class NaiveAccession {
 		userStore.establishUserSession(user, sessionKey);
 		
 		String tags[] = new String[] {
+				"MostBeautiful",
+				"dataisbeautiful",
 				"aww",
-				"pics",
-				"earthporn"				
+				"animalsbeingjerks"
 		};
 		for(String tag : tags) {
 			new Thread(new Runnable() {
