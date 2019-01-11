@@ -48,10 +48,9 @@ public class NaiveAccession {
 		userStore.establishUserSession(user, sessionKey);
 		
 		String tags[] = new String[] {
-				"MostBeautiful",
-				"dataisbeautiful",
 				"aww",
-				"animalsbeingjerks"
+				"animalsbeingjerks",
+				"faces"
 		};
 		for(String tag : tags) {
 			new Thread(new Runnable() {
@@ -63,13 +62,22 @@ public class NaiveAccession {
 					do {
 						//note keyboard click with focus = tag, need to keep tags by color and keep them on when selected
 						after = reddit.readPage("https://www.reddit.com/r/"+tag+"/.json?raw_json=1", after);
+						if(after==null) {
+							try {
+								Thread.sleep(20000);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
 						try {
-							Thread.sleep(3000);
+							long delay = (long) (Math.random() * 6000);
+							Thread.sleep(delay);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}while(after!=null);
+					}while(true);
 					
 				}
 			}).start();			

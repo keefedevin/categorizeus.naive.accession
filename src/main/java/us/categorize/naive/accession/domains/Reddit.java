@@ -1,8 +1,14 @@
 package us.categorize.naive.accession.domains;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -21,6 +27,7 @@ import us.categorize.api.UserStore;
 import us.categorize.model.Attachment;
 import us.categorize.model.Message;
 import us.categorize.model.User;
+import us.categorize.naive.accession.util.ImageUtil;
 
 //quick prototype, extracting interfaces later
 public class Reddit {
@@ -84,10 +91,11 @@ public class Reddit {
 			    			}
 			    		}
 			    		lastSeen = name;
-			    		Attachment attachment = addAttachment(message, img);
+			    		Attachment attachments[] = addAttachment(message, img);
 			    		message = messageStore.createMessage(message);
-			    		attachment.setMessageId(message.getId());
-			    		messageStore.updateAttachment(attachment);
+			    		for(Attachment attachment : attachments) {
+			    			messageStore.associateAttachment(message, attachment);
+			    		}
 			    		System.out.println("Added " + name);
 			    		Thread.sleep(delay);
 			    	}
@@ -105,17 +113,30 @@ public class Reddit {
 		return lastSeen;
 	}
 
-	private Attachment addAttachment(Message message, String img) {
+	private Attachment[] addAttachment(Message message, String img) {
 		String fname = img.substring(img.lastIndexOf("/"));
-		Attachment attachment = new Attachment();
-		attachment.setFilename(fname);
-		attachment.setMessageId(message.getId());
 		HttpGet httpget = new HttpGet(img);
 		CloseableHttpResponse response = null;
+		Attachment attached[] = new Attachment[2];
 		try {
 			response = client.execute(httpget);
 		    HttpEntity entity = response.getEntity();
-		    messageStore.createAttachment(attachment, entity.getContent());
+		    byte imageBytes[] = ImageUtil.toByteArray(entity.getContent());
+		    BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+			Attachment originalImage = new Attachment();
+			originalImage.setFilename(fname);
+			originalImage.setLength((long) imageBytes.length);
+			if(fname!=null) {
+				originalImage.setExtension(fname.substring(fname.lastIndexOf('.')));
+			}
+		    messageStore.createAttachment(originalImage, new ByteArrayInputStream(imageBytes));
+		    attached[0] = originalImage;
+			Attachment thumbnail = new Attachment();
+		    InputStream thumb = ImageUtil.createThumbnail(image);
+		    thumbnail.setExtension(".jpg");
+			thumbnail.setFilename(fname.replace(".", "_small."));
+		    messageStore.createAttachment(thumbnail, thumb);
+		    attached[1] = thumbnail;
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,7 +152,7 @@ public class Reddit {
 				e.printStackTrace();
 			}
 		}
-		return attachment;
+		return attached;
 	}
 	
 }
