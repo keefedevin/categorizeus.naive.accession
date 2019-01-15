@@ -8,6 +8,11 @@
 	<version>0.1-SNAPSHOT</version>
 	<name>categorizeus.naive.accession</name>
 	<url>http://maven.apache.org</url>
+	<properties>
+		<categorizeus.version>0.1-SNAPSHOT</categorizeus.version>
+		<jackson.version>2.9.8</jackson.version>
+		<httpclient.version>4.5.6</httpclient.version>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -71,23 +76,23 @@
 		<dependency>
 			<groupId>us.categorize</groupId>
 			<artifactId>naive.app</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${categorizeus.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.7.4</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.7.4</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.6</version>
+			<version>${httpclient.version}</version>
 		</dependency>
 
 	</dependencies>

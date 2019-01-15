@@ -7,17 +7,17 @@ import java.util.UUID;
 import us.categorize.CategorizeUs;
 import us.categorize.api.UserStore;
 import us.categorize.model.User;
-import us.categorize.naive.NaiveMessageStore;
 import us.categorize.naive.NaiveUserStore;
 import us.categorize.naive.accession.domains.Reddit;
-import us.categorize.naive.api.NaiveAuthorizer;
 import us.categorize.naive.app.Config;
 import us.categorize.naive.app.NaiveApp;
 
 public class NaiveAccession {
 	private static final String userName = "reddit-user";
 	private static final String pass = "35789fb6e";
-	
+	private  static final String tags[] = new String[] {
+			"2pac"
+	};
 	public static void main(String[] args) throws Exception{
 		Properties properties = new Properties();
 		InputStream input = NaiveApp.class.getResourceAsStream("/categorizeus.properties");
@@ -47,11 +47,7 @@ public class NaiveAccession {
 		}
 		userStore.establishUserSession(user, sessionKey);
 		
-		String tags[] = new String[] {
-				"aww",
-				"animalsbeingjerks",
-				"faces"
-		};
+
 		for(String tag : tags) {
 			new Thread(new Runnable() {
 				
@@ -71,7 +67,7 @@ public class NaiveAccession {
 							}
 						}
 						try {
-							long delay = (long) (Math.random() * 6000);
+							long delay = 10000l + (long) (Math.random() * 60000);
 							Thread.sleep(delay);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block

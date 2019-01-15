@@ -2,7 +2,6 @@ package us.categorize.naive.accession.domains;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -38,7 +37,7 @@ public class Reddit {
 	private MessageStore messageStore;
 	private long delay = 1000;
 	private CloseableHttpClient client;
-	private static String userAgentString = "us.categorize.naive.accession";
+	private static String userAgentString = "us.categorize.naive.accession123";
 	
 	public Reddit(User user, UserStore userStore, MessageStore messageStore) {
 		this.user = user;
@@ -70,7 +69,7 @@ public class Reddit {
 			    		ObjectNode entryMeta = (ObjectNode) entry;
 			    		ObjectNode entryO = (ObjectNode) entryMeta.get("data");
 			    		String name = entryO.get("name").asText();
-			    		String link = entryO.get("permalink").asText();
+			    		String link = entryO.get("permalink").asText();//????? NPE
 			    		String img = entryO.get("url").asText();
 			    		String title = entryO.get("title").asText();
 			    		String subreddit = entryO.get("subreddit").asText();
@@ -106,7 +105,7 @@ public class Reddit {
 			} finally {
 			    response.close();
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
