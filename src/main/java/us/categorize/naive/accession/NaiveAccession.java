@@ -7,10 +7,8 @@ import java.util.UUID;
 import us.categorize.CategorizeUs;
 import us.categorize.api.UserStore;
 import us.categorize.model.User;
-import us.categorize.naive.NaiveMessageStore;
 import us.categorize.naive.NaiveUserStore;
 import us.categorize.naive.accession.domains.Reddit;
-import us.categorize.naive.api.NaiveAuthorizer;
 import us.categorize.naive.app.Config;
 import us.categorize.naive.app.NaiveApp;
 
@@ -29,7 +27,7 @@ public class NaiveAccession {
 		categorizeUsConfig.configureCategorizeUs();
 		
 		Configuration accessConfig = new Configuration();
-		accessConfig.setAddDuplicateAttachments(false);
+		accessConfig.setAddDuplicateAttachments(true);
 		UserStore userStore = CategorizeUs.instance().getUserStore();
 		
 		User user = new User();

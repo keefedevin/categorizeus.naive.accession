@@ -85,21 +85,24 @@ public class Reddit {
 			    		message.setBody(name + " " + link);
 			    		message.setPostedBy(user.getId());
 			    		title = title + " " + subreddit;
-			    		String tags[] = title.split(" ");
-			    		Set<String> added = new HashSet<String>();
-			    		for(String tag : tags) {
-			    			tag = tag.toLowerCase();
-			    			if(!added.contains(tag)) {
-			    				//messageStore.addMessageTag(message.getId(), tag, user);
-			    				added.add(tag);
-			    			}
-			    		}
+
 			    		lastSeen = name;
 			    		Attachment attachments[] = addAttachment(message, img);
 			    		if(attachments!=null) {
 				    		message = messageStore.createMessage(message);
 				    		for(Attachment attachment : attachments) {
 				    			messageStore.associateAttachment(message, attachment);
+				    		}
+				    		if(config.isAddTags()) {
+					    		String tags[] = title.split(" ");
+					    		Set<String> added = new HashSet<String>();
+					    		for(String tag : tags) {
+					    			tag = tag.toLowerCase();
+					    			if(tag.length()>3 && !added.contains(tag)) {
+					    				messageStore.addMessageTag(message.getId(), tag, user);
+					    				added.add(tag);
+					    			}
+					    		}
 				    		}
 				    		System.out.println("Added " + name);
 			    		}else {
@@ -138,7 +141,7 @@ public class Reddit {
 			    messageStore.signAttachment(attached[0], signature);
 			    return attached;
 			}
-			System.out.println("Duplicate attachment found");
+			System.out.println("Duplicate attachment found " + signature);
 			if(!config.isAddDuplicateAttachments()) {
 				return null;
 			}
