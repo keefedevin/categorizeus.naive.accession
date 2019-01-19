@@ -26,6 +26,7 @@ import us.categorize.api.UserStore;
 import us.categorize.model.Attachment;
 import us.categorize.model.Message;
 import us.categorize.model.User;
+import us.categorize.naive.accession.Configuration;
 import us.categorize.naive.accession.util.ImageUtil;
 
 //quick prototype, extracting interfaces later
@@ -37,17 +38,21 @@ public class Reddit {
 	private MessageStore messageStore;
 	private long delay = 1000;
 	private CloseableHttpClient client;
+	private Configuration config;
 	private static String userAgentString = "us.categorize.naive.accession123";
 	
 	public Reddit(User user, UserStore userStore, MessageStore messageStore) {
+		this(new Configuration(), user, userStore, messageStore);
+	}
+	
+	public Reddit(Configuration config, User user, UserStore userStore, MessageStore messageStore) {
 		this.user = user;
 		this.userStore = userStore;
 		this.messageStore = messageStore;
+		this.config = config;
 		client = HttpClients.custom().setUserAgent(userAgentString).build();
-		
-
 	}
-	
+
 	public String readPage(String base, String after) {
 		String url = base + (after==null?"":"&after="+after);
 		System.out.println(url);
@@ -91,11 +96,15 @@ public class Reddit {
 			    		}
 			    		lastSeen = name;
 			    		Attachment attachments[] = addAttachment(message, img);
-			    		message = messageStore.createMessage(message);
-			    		for(Attachment attachment : attachments) {
-			    			messageStore.associateAttachment(message, attachment);
+			    		if(attachments!=null) {
+				    		message = messageStore.createMessage(message);
+				    		for(Attachment attachment : attachments) {
+				    			messageStore.associateAttachment(message, attachment);
+				    		}
+				    		System.out.println("Added " + name);
+			    		}else {
+				    		System.out.println("No attach skipping " + name);
 			    		}
-			    		System.out.println("Added " + name);
 			    		Thread.sleep(delay);
 			    	}
 			    }
@@ -121,21 +130,19 @@ public class Reddit {
 			response = client.execute(httpget);
 		    HttpEntity entity = response.getEntity();
 		    byte imageBytes[] = ImageUtil.toByteArray(entity.getContent());
-		    BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
-			Attachment originalImage = new Attachment();
-			originalImage.setFilename(fname);
-			originalImage.setLength((long) imageBytes.length);
-			if(fname!=null) {
-				originalImage.setExtension(fname.substring(fname.lastIndexOf('.')));
+		    String signature = ImageUtil.bytesToHash(imageBytes);
+		    
+			Attachment originalImage = messageStore.findSignedAttachment(signature);
+			if(originalImage==null) {
+			    createNewAttachments(fname, attached, imageBytes);
+			    messageStore.signAttachment(attached[0], signature);
+			    return attached;
 			}
-		    messageStore.createAttachment(originalImage, new ByteArrayInputStream(imageBytes));
-		    attached[0] = originalImage;
-			Attachment thumbnail = new Attachment();
-		    InputStream thumb = ImageUtil.createThumbnail(image);
-		    thumbnail.setExtension(".jpg");
-			thumbnail.setFilename(fname.replace(".", "_small."));
-		    messageStore.createAttachment(thumbnail, thumb);
-		    attached[1] = thumbnail;
+			System.out.println("Duplicate attachment found");
+			if(!config.isAddDuplicateAttachments()) {
+				return null;
+			}
+			return messageStore.findAssociatedAttachments(originalImage);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -152,6 +159,25 @@ public class Reddit {
 			}
 		}
 		return attached;
+	}
+
+	private void createNewAttachments(String fname, Attachment[] attached, byte[] imageBytes) throws IOException {
+		Attachment originalImage;
+		BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+		originalImage = new Attachment();
+		originalImage.setFilename(fname);
+		originalImage.setLength((long) imageBytes.length);
+		if(fname!=null) {
+			originalImage.setExtension(fname.substring(fname.lastIndexOf('.')));
+		}
+		messageStore.createAttachment(originalImage, new ByteArrayInputStream(imageBytes));
+		attached[0] = originalImage;
+		Attachment thumbnail = new Attachment();
+		InputStream thumb = ImageUtil.createThumbnail(image);
+		thumbnail.setExtension(".jpg");
+		thumbnail.setFilename(fname.replace(".", "_small."));
+		messageStore.createAttachment(thumbnail, thumb);
+		attached[1] = thumbnail;
 	}
 	
 }

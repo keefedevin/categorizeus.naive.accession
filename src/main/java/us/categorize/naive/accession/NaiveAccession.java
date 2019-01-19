@@ -7,8 +7,10 @@ import java.util.UUID;
 import us.categorize.CategorizeUs;
 import us.categorize.api.UserStore;
 import us.categorize.model.User;
+import us.categorize.naive.NaiveMessageStore;
 import us.categorize.naive.NaiveUserStore;
 import us.categorize.naive.accession.domains.Reddit;
+import us.categorize.naive.api.NaiveAuthorizer;
 import us.categorize.naive.app.Config;
 import us.categorize.naive.app.NaiveApp;
 
@@ -16,16 +18,18 @@ public class NaiveAccession {
 	private static final String userName = "reddit-user";
 	private static final String pass = "35789fb6e";
 	private  static final String tags[] = new String[] {
-			"2pac"
+			"photography"
 	};
 	public static void main(String[] args) throws Exception{
 		Properties properties = new Properties();
 		InputStream input = NaiveApp.class.getResourceAsStream("/categorizeus.properties");
 		properties.load(input);
 		//note overrideProperties and toLocal in Config, just load another properties files and override with these as desired
-		Config config = new Config(properties);
-		config.configureCategorizeUs();
+		Config categorizeUsConfig = new Config(properties);
+		categorizeUsConfig.configureCategorizeUs();
 		
+		Configuration accessConfig = new Configuration();
+		accessConfig.setAddDuplicateAttachments(false);
 		UserStore userStore = CategorizeUs.instance().getUserStore();
 		
 		User user = new User();
@@ -53,7 +57,7 @@ public class NaiveAccession {
 				
 				@Override
 				public void run() {
-					Reddit reddit = new Reddit(user, userStore, CategorizeUs.instance().getMessageStore());
+					Reddit reddit = new Reddit(accessConfig, user, userStore, CategorizeUs.instance().getMessageStore());
 					String after = null;
 					do {
 						//note keyboard click with focus = tag, need to keep tags by color and keep them on when selected

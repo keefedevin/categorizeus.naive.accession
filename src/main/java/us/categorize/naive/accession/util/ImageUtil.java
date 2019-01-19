@@ -8,6 +8,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import javax.imageio.ImageIO;
 
@@ -52,5 +54,24 @@ public class ImageUtil {
 		}
 		os.flush();
 		return os.toByteArray();
+	}
+	
+	public static String bytesToHash(byte[] bytes) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest(bytes);
+		    StringBuffer hexString = new StringBuffer();
+		    for (int i = 0; i < hash.length; i++) {
+		    	String hex = Integer.toHexString(0xff & hash[i]);
+		    	if(hex.length() == 1) hexString.append('0');
+		        hexString.append(hex);
+		    }
+		    return hexString.toString();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
