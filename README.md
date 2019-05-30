@@ -32,3 +32,5 @@ there might be a Puppy in there too
 OK this data set should do it
 
 now I have to do Front End work sigh usually I have people for that
+
+ACTUALLY a thought occured have some sister pics in there too, can do mainline identification then similarity metrics
