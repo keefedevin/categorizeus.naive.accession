@@ -16,7 +16,27 @@ public class NaiveAccession {
 	private static final String userName = "reddit-user";
 	private static final String pass = "35789fb6e";
 	private  static final String tags[] = new String[] {
-			"photography"
+			"photography",
+			"art",
+			"earthporn",
+			"aww",
+			"animalsbeingjerks",
+			"natureisfuckinglit",
+			"noahcyrus",
+			"tattoos",
+			"animalsbeingderps",
+			"cooking",
+			"foodporn",
+			"roastme",
+			"dogs",
+			"funny",
+			"shittyfoodporn",
+			"cozyplaces",
+			"rarepuppers",
+			"wewantplates",
+			"celebs",
+			"vandwellers",
+			"artporn"
 	};
 	public static void main(String[] args) throws Exception{
 		Properties properties = new Properties();
@@ -27,7 +47,7 @@ public class NaiveAccession {
 		categorizeUsConfig.configureCategorizeUs();
 		
 		Configuration accessConfig = new Configuration();
-		accessConfig.setAddDuplicateAttachments(true);
+		accessConfig.setAddDuplicateAttachments(false);
 		UserStore userStore = CategorizeUs.instance().getUserStore();
 		
 		User user = new User();
@@ -59,17 +79,17 @@ public class NaiveAccession {
 					String after = null;
 					do {
 						//note keyboard click with focus = tag, need to keep tags by color and keep them on when selected
-						after = reddit.readPage("https://www.reddit.com/r/"+tag+"/.json?raw_json=1", after);
+						after = reddit.readPage("https://www.reddit.com/r/"+tag+"/new/.json?raw_json=1", after);
 						if(after==null) {
 							try {
-								Thread.sleep(20000);
+								Thread.sleep(1000);
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
 						try {
-							long delay = 10000l + (long) (Math.random() * 60000);
+							long delay = 2000l + (long) (Math.random() * 2000);
 							Thread.sleep(delay);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
