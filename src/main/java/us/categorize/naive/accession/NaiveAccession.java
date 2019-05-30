@@ -46,7 +46,7 @@ public class NaiveAccession {
 		categorizeUsConfig.configureCategorizeUs();
 		
 		Configuration accessConfig = new Configuration();
-		accessConfig.setAddDuplicateAttachments(false);
+		accessConfig.setAddDuplicateAttachments(true);
 		UserStore userStore = CategorizeUs.instance().getUserStore();
 		
 		User user = new User();
