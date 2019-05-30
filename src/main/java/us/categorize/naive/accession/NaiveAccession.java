@@ -34,7 +34,6 @@ public class NaiveAccession {
 			"cozyplaces",
 			"rarepuppers",
 			"wewantplates",
-			"celebs",
 			"vandwellers",
 			"artporn"
 	};
