@@ -24,3 +24,11 @@ then it checks for the largest # of tags and says oh
 THAT Signature belongs to THAT face
 
 makes cents
+
+so there make a small adjustment to the Artwork going into the Museum
+so this will overwhelm the system and make it extremely easy to see which Face came out on Top
+there might be a Puppy in there too
+
+OK this data set should do it
+
+now I have to do Front End work sigh usually I have people for that

@@ -16,14 +16,14 @@ public class NaiveAccession {
 	private static final String userName = "reddit-user";
 	private static final String pass = "35789fb6e";
 	private  static final String tags[] = new String[] {
-			"photography",
+			//"photography",
 			"art",
 			"earthporn",
 			"aww",
 			"animalsbeingjerks",
 			"natureisfuckinglit",
-			"noahcyrus",
-			"tattoos",
+			"noahcyrus"
+			/*"tattoos",
 			"animalsbeingderps",
 			"cooking",
 			"foodporn",
@@ -35,7 +35,7 @@ public class NaiveAccession {
 			"rarepuppers",
 			"wewantplates",
 			"vandwellers",
-			"artporn"
+			"artporn"*/
 	};
 	public static void main(String[] args) throws Exception{
 		Properties properties = new Properties();
