@@ -16,26 +16,7 @@ public class NaiveAccession {
 	private static final String userName = "reddit-user";
 	private static final String pass = "35789fb6e";
 	private  static final String tags[] = new String[] {
-			//"photography",
-			"art",
-			"earthporn",
-			"aww",
-			"animalsbeingjerks",
-			"natureisfuckinglit",
-			"noahcyrus"
-			/*"tattoos",
-			"animalsbeingderps",
-			"cooking",
-			"foodporn",
-			"roastme",
-			"dogs",
-			"funny",
-			"shittyfoodporn",
-			"cozyplaces",
-			"rarepuppers",
-			"wewantplates",
-			"vandwellers",
-			"artporn"*/
+			"AskReddit"
 	};
 	public static void main(String[] args) throws Exception{
 		Properties properties = new Properties();

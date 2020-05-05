@@ -74,40 +74,46 @@ public class Reddit {
 			    		ObjectNode entryMeta = (ObjectNode) entry;
 			    		ObjectNode entryO = (ObjectNode) entryMeta.get("data");
 			    		String name = entryO.get("name").asText();
-			    		String link = entryO.get("permalink").asText();//????? NPE
+			    		String link = entryO.get("permalink").asText();
 			    		String img = entryO.get("url").asText();
 			    		String title = entryO.get("title").asText();
+			    		String permalink = "https://www.reddit.com"+entryO.get("permalink").asText()+".json?raw_json=1";
+			    		System.out.println(permalink);
+			    		String posthint = entryO.get("post_hint")==null?null:entryO.get("post_hint").asText();
 			    		String subreddit = entryO.get("subreddit").asText();
+			    		String body = entryO.get("selftext").asText();
 			    		System.out.println(name + " " + img + " " + title);
-			    		if(!(img.endsWith("jpg")||img.endsWith("png"))) continue;
 			    		Message message = new Message();
 			    		message.setTitle(title);
-			    		message.setBody(name + " " + link);
+			    		message.setBody(body);
 			    		message.setPostedBy(user.getId());
 			    		title = title + " " + subreddit;
 
 			    		lastSeen = name;
-			    		Attachment attachments[] = addAttachment(message, img);
+			    		Attachment attachments[] = null;
+			    		if("image".equals(posthint) && (img.endsWith("jpg")||img.endsWith("png"))) {
+			    			attachments = addAttachment(message, img);			    			
+			    		}
+			    		
+			    		message = messageStore.createMessage(message);
+			    		loadComments(permalink, message);
 			    		if(attachments!=null) {
-				    		message = messageStore.createMessage(message);
 				    		for(Attachment attachment : attachments) {
 				    			messageStore.associateAttachment(message, attachment);
 				    		}
-				    		if(config.isAddTags()) {
-					    		String tags[] = title.split(" ");
-					    		Set<String> added = new HashSet<String>();
-					    		for(String tag : tags) {
-					    			tag = tag.toLowerCase();
-					    			if(tag.length()>3 && !added.contains(tag)) {
-					    				messageStore.addMessageTag(message.getId(), tag, user);
-					    				added.add(tag);
-					    			}
-					    		}
-				    		}
-				    		System.out.println("Added " + name);
-			    		}else {
-				    		System.out.println("No attach skipping " + name);
 			    		}
+			    		if(config.isAddTags()) {
+				    		String tags[] = title.split(" ");
+				    		Set<String> added = new HashSet<String>();
+				    		for(String tag : tags) {
+				    			tag = tag.toLowerCase();
+				    			if(tag.length()>3 && !added.contains(tag)) {
+				    				messageStore.addMessageTag(message.getId(), tag, user);
+				    				added.add(tag);
+				    			}
+				    		}
+			    		}
+			    		System.out.println("Added " + name);
 			    		Thread.sleep(delay);
 			    	}
 			    }
@@ -122,6 +128,66 @@ public class Reddit {
 			e.printStackTrace();
 		}
 		return lastSeen;
+	}
+	
+	private void loadComments(String permalink, Message message) {
+		HttpGet httpget = new HttpGet(permalink);
+		CloseableHttpResponse response;
+		try {
+			response = client.execute(httpget);
+		    HttpEntity entity = response.getEntity();
+	    	ArrayNode arr = (ArrayNode) mapper.readTree(entity.getContent());
+	    	if(arr.size()>1) {
+		    	ObjectNode commentsO = (ObjectNode) arr.get(1);
+		    	ObjectNode data = (ObjectNode) commentsO.get("data");
+		    	JsonNode childrenJ = data.get("children");
+		    	if(childrenJ instanceof ArrayNode) {
+			    	ArrayNode comments = (ArrayNode) data.get("children");
+			    	for(JsonNode entry : comments) {
+			    		ObjectNode entryMeta = (ObjectNode) entry;
+			    		addCommentTree(message, entryMeta);
+			    	}		    		
+		    	}
+	    	}	    	
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void addCommentTree(Message parent, ObjectNode node) {
+		ObjectNode entryO = (ObjectNode) node.get("data");
+		System.out.println(parent.getId()+","+entryO.get("id").asText());
+		String name = entryO.get("name").asText();
+		String title = entryO.get("author_fullname").asText();
+
+		String body = entryO.get("body").asText();
+		System.out.println(name  + " " + title);
+		Message message = new Message();
+		message.setTitle(title);
+		message.setBody(body);
+		if(parent.getRootRepliesTo()!=null) {
+			message.setRootRepliesTo(parent.getRootRepliesTo());
+		}else {
+			message.setRootRepliesTo(parent.getId());
+		}
+		message.setRepliesTo(parent.getId());
+		message.setPostedBy(user.getId());
+		messageStore.createMessage(message);
+		if(entryO.get("replies")!=null && entryO.get("replies") instanceof ObjectNode) {
+			ObjectNode repliesNode = (ObjectNode) entryO.get("replies");
+			if(repliesNode.get("data")!=null && repliesNode.get("data") instanceof ObjectNode) {
+				ObjectNode repliesData = (ObjectNode) repliesNode.get("data");
+				if(repliesData.get("children")!=null && repliesData.get("children") instanceof ArrayNode) {
+					ArrayNode subComments = (ArrayNode) repliesData.get("children");
+			    	for(JsonNode entry : subComments) {
+			    		ObjectNode entryMeta = (ObjectNode) entry;
+			    		addCommentTree(message, entryMeta);
+			    	}	
+				}
+			}
+			
+		}
 	}
 
 	private Attachment[] addAttachment(Message message, String img) {
